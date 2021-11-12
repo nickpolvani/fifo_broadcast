@@ -1,0 +1,121 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: Validate Stress Test Perfect Links",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/tools/validate_perfect_links.py",
+            "args":[
+                "--hosts",
+                 "${workspaceFolder}/example/output/hosts",
+                "--config",
+                 "${workspaceFolder}/example/output/config",
+                "--out_dir",
+                "${workspaceFolder}/example/output"
+            ],
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "(gdb) Launch Process 1",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/src/da_proc",
+            "args": [
+                "--id",
+                "1",
+                "--hosts",
+                "${workspaceFolder}/example/hosts",
+                "--output",
+                "${workspaceFolder}/example/output/1.output",
+                "${workspaceFolder}/example/configs/perfect-links.config"
+            ],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "(gdb) Launch Process 2",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/src/da_proc",
+            "args": [
+                "--id",
+                "2",
+                "--hosts",
+                "${workspaceFolder}/example/hosts",
+                "--output",
+                "${workspaceFolder}/example/output/2.output",
+                "${workspaceFolder}/example/configs/perfect-links.config"
+            ],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "(gdb) Launch Process 3",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/src/da_proc",
+            "args": [
+                "--id",
+                "3",
+                "--hosts",
+                "${workspaceFolder}/example/hosts",
+                "--output",
+                "${workspaceFolder}/example/output/3.output",
+                "${workspaceFolder}/example/configs/perfect-links.config"
+            ],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+    ],
+    "compounds": [
+        {
+            "name": "2 Processes",
+            "configurations": [
+                "(gdb) Launch Process 1",
+                "(gdb) Launch Process 2"
+            ],
+        },
+        {
+            "name": "3 Processes",
+            "configurations": [
+                "(gdb) Launch Process 1",
+                "(gdb) Launch Process 3",
+                "(gdb) Launch Process 2",
+            ],
+        }
+    ]
+}

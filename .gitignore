@@ -1,0 +1,4 @@
+__pycache__/
+build
+example/output
+passphrase.txt

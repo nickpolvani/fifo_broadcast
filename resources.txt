@@ -1,0 +1,41 @@
+# signal library
+https://www.tutorialspoint.com/c_standard_library/signal_h.htm
+
+# sockets and UDP
+https://pubs.opengroup.org/onlinepubs/7908799/xns/syssocket.h.html
+https://www.geeksforgeeks.org/udp-server-client-implementation-c/
+
+# reference project?
+https://github.com/vincentballet/LocalizedCausalBroadcast
+
+# Threads
+https://www.cplusplus.com/reference/thread/thread/
+
+# Pattern Observer
+https://medium.com/@gayashanbc/explore-the-observer-design-pattern-with-c-8592459b0486
+
+# Multi-thread and sockets
+https://www.geeksforgeeks.org/handling-multiple-clients-on-server-with-multithreading-using-socket-programming-in-c-cpp/
+
+# Producer consumer idea
+https://stackoverflow.com/questions/22485181/multithreaded-udp-server
+
+# see messages on the network
+netcat
+
+used with MultiThreading (implement ThreadSafe queue)
+https://en.cppreference.com/w/cpp/thread/condition_variable
+https://en.cppreference.com/w/cpp/container/queue/queue
+https://www.educba.com/c-thread-safe-queue/
+
+# equivalent of synchronized for a block of code
+https://en.cppreference.com/w/cpp/thread/lock_guard
+
+# in Queue insert pointers, otherwise objects are destroyed
+https://stackoverflow.com/questions/1514311/removing-from-stl-stdqueue-without-destructing-the-removed-object
+
+# copy and swap idiom (to create = operator)
+https://stackoverflow.com/questions/3279543/what-is-the-copy-and-swap-idiom
+
+# timeout on socket recvfrom
+https://stackoverflow.com/questions/27347250/stop-recvfrom-after-certain-time
