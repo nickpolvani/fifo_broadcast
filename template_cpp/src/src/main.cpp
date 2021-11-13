@@ -5,10 +5,10 @@
 #include "parser.hpp"
 #include "hello.h"
 #include <signal.h>
-#include "process_controller.hpp"
+
 #include <assert.h>
 
-ProcessController * PROCESS_CONTROLLER;
+
 
 
 static void stop(int) {
@@ -19,7 +19,7 @@ static void stop(int) {
   std::cout << "Terminate command received. Closing files\n";
   std::cout.flush();
 
-  PROCESS_CONTROLLER -> stopProcess();
+
 
   // exit directly from signal handler
   exit(0);
@@ -61,9 +61,10 @@ int main(int argc, char **argv) {
   std::cout << parser.configPath() << "\n\n";
 
   std::cout << "Initializing Process Controller\n";
-  PROCESS_CONTROLLER = new ProcessController(parser.id(), parser);
+
+
   std::cout << "Begin sending/receiving messages\n";
-  PROCESS_CONTROLLER -> start();
+
 
   return 0;
 }

@@ -57,19 +57,21 @@ first_msg_seq_num + getNumMessages() - 1. A packet is uniquely identfied by proc
 class Packet{
     private:
         std::vector<Message> messages = std::vector<Message>();
-        bool is_ack = false;
+        
 
     public:
         static const int max_length = MAX_LENGTH; // in bytes
         long unsigned int process_id;   // process id of the sender
+        long unsigned int source_id;    // process id of the original process that sent this packet
         long unsigned int packet_seq_num;   // sequence number of the packet
         long unsigned int first_msg_seq_num = 0; // sequence number of the first message
         long unsigned int payload_length = 0; // number of bytes of payload
+        bool is_ack = false;
 
-
-        Packet(long unsigned int i_process_id, long unsigned int i_packet_seq_num) : 
-            process_id(i_process_id), packet_seq_num(i_packet_seq_num){};
+        Packet(long unsigned int i_process_id, long unsigned int i_source_id, long unsigned int i_packet_seq_num) : 
+            process_id(i_process_id), source_id(i_source_id), packet_seq_num(i_packet_seq_num){};
         
+        Packet(): process_id(0), source_id(0), packet_seq_num(0){};
 
         bool canAddMessage(Message m){
             if (is_ack){
@@ -80,9 +82,6 @@ class Packet{
         }
 
         void addMessage(Message m){
-            if (process_id == 2){
-                DEBUG_MSG("Process 2 is adding a message\n");
-            }
             if (messages.size() == 0){
                 first_msg_seq_num = std::stoul(m.payload);  // payload in this application 
                                                             // is the sequence number of the message
@@ -108,6 +107,7 @@ class Packet{
         long unsigned int getLength(){
             long unsigned int header_length = std::to_string(process_id).size() + 
                                 std::to_string(packet_seq_num).size() + 
+                                std::to_string(source_id).size() + 
                                 std::to_string(first_msg_seq_num).size() +
                                 std::to_string(static_cast<unsigned int>(is_ack)).size() +
                                 std::to_string(payload_length).size() + 5; //NULL characters
@@ -123,11 +123,11 @@ class Packet{
 
         static Packet decodeData(char * data);
 
-        /* i_process_id: id of the process that received the message.
+        /* i_process_id: id of the process that sent the ack (therefore received the corresponding message).
            i_progressive_number: progressive number of the message received
         */
-        static Packet createAck(long unsigned int i_process_id, long unsigned int i_packet_seq_num){
-            Packet ackPacket = Packet(i_process_id, i_packet_seq_num);
+        static Packet createAck(long unsigned int i_process_id, long unsigned int i_source_id, long unsigned int i_packet_seq_num){
+            Packet ackPacket = Packet(i_process_id, i_source_id, i_packet_seq_num);
             ackPacket.is_ack = true;
             ackPacket.payload_length = 0;
             return ackPacket;

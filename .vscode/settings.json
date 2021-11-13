@@ -52,7 +52,8 @@
         "sstream": "cpp",
         "stdexcept": "cpp",
         "streambuf": "cpp",
-        "typeinfo": "cpp"
+        "typeinfo": "cpp",
+        "set": "cpp"
     },
     "cmake.sourceDirectory": "${workspaceFolder}/template_cpp",
     "cmake.debugConfig": {
