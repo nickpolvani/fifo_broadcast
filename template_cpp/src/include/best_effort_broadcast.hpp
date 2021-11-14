@@ -36,8 +36,18 @@ class BestEffortBroadcast{
 
 
     public:
-        BestEffortBroadcast(UniformReliableBroadcast* i_urb, PerfectLink* pl, std::vector<Parser::Host> i_hosts): 
-           perfect_link(pl), urb(i_urb), hosts(i_hosts){}; 
+        BestEffortBroadcast( PerfectLink* pl, std::vector<Parser::Host> i_hosts): 
+           perfect_link(pl), hosts(i_hosts){}; 
+
+        ~BestEffortBroadcast(){
+            for (auto thread: threads){
+                delete thread;
+            }
+        }
+
+        void setURB(UniformReliableBroadcast* i_urb){
+            urb = i_urb;
+        }
 
         // contains pointers to running threads (deliver, broadcast)
         std::vector<std::thread *> threads; 

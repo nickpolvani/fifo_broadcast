@@ -8,6 +8,7 @@
 #include <mutex>
 #include "fifo_broadcast.hpp"
 #include "thread_safe_queue.hpp"
+#include <thread>
 
 
 using namespace packet;
@@ -24,14 +25,14 @@ class UniformReliableBroadcast{
         // called by BEBDeliver(), broadcast() to access pending
         std::mutex pending_mutex;
 
-        // pending[source_id][seq_num] returns corresponding packet
-        std::map<long unsigned int, std::map<long unsigned int, Packet>> pending;
+        // pending[source_id] returns set of packet_seq_num of pending packets
+        std::map<long unsigned int, std::set<long unsigned int>> pending;
         
         // acks[source_id][seq_num] returns set of processes that have re-sent the packet with corresponding
         // source_id, packet_seq_num 
         std::map<long unsigned int, std::map<long unsigned int, std::set<long unsigned int>>> acks;
 
-        int num_processes = -1;
+        long unsigned int num_processes;
 
         // lower level abstraction
         BestEffortBroadcast* beb = NULL;
@@ -43,17 +44,26 @@ class UniformReliableBroadcast{
         // that checks if packets can be URBDelivered
         ThreadSafeQueue<Packet> packets_to_deliver;
 
-        // permanent thread that consumes p_to_check_for_delivery
-        void tryDeliver();
-
         // checks if packet was retransmitted by a majority of processes (looking at number of acks)
-        void canDeliver(long unsigned int source_id, long unsigned int seq_num);
+        bool canDeliver(long unsigned int source_id, long unsigned int seq_num);
 
         // permanent thread consuming packets_to_deliver
         void URBDeliver();        
 
 
     public:
+
+        UniformReliableBroadcast(long unsigned int i_num_processes) : num_processes(i_num_processes){}
+
+        ~UniformReliableBroadcast(){
+            for (auto thread: threads){
+                delete thread;
+            }
+        }
+        
+        // contains active threads (URBDeliver)
+        std::vector<std::thread *> threads;
+
         // deliver function invoked by Best Effort Broadcast 
         // (lower level abstraction)
         void BEBDeliver(Packet p);
@@ -67,6 +77,9 @@ class UniformReliableBroadcast{
         }
 
         void broadcast(Packet p);
+
+        // begins execution of threads and adds them to threads
+        void start();
 
 };
 

@@ -31,7 +31,7 @@
                 "${workspaceFolder}/example/hosts",
                 "--output",
                 "${workspaceFolder}/example/output/1.output",
-                "${workspaceFolder}/example/configs/perfect-links.config"
+                "${workspaceFolder}/example/configs/fifo-broadcast.config"
             ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
@@ -58,7 +58,7 @@
                 "${workspaceFolder}/example/hosts",
                 "--output",
                 "${workspaceFolder}/example/output/2.output",
-                "${workspaceFolder}/example/configs/perfect-links.config"
+                "${workspaceFolder}/example/configs/fifo-broadcast.config"
             ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
@@ -85,7 +85,7 @@
                 "${workspaceFolder}/example/hosts",
                 "--output",
                 "${workspaceFolder}/example/output/3.output",
-                "${workspaceFolder}/example/configs/perfect-links.config"
+                "${workspaceFolder}/example/configs/fifo-broadcast.config"
             ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

@@ -28,7 +28,7 @@ class PerfectLink{
 
         ThreadSafeQueue<Packet> received_packets;
 
-        std::map<long unsigned int, sockaddr_in> host_addresses;
+        std::map<long unsigned int, sockaddr_in> * host_addresses;
 
         // delivered[process_id][source_id] returns the set of sequence numbers of packets delivered
         // that were received from process_id, with original sender source_id
@@ -41,7 +41,7 @@ class PerfectLink{
         ThreadSafeQueue<Packet_ProcId> acks_to_send;
 
         // Higher abstraction, perfect link delivers to beb
-        BestEffortBroadcast* beb;
+        BestEffortBroadcast* beb = NULL;
 
         // used to synchronize Thread that sends acks and Thread that sends normal packets
         std::mutex sender_lock;
@@ -79,7 +79,18 @@ class PerfectLink{
 
         // hosts contains a mapping process_id, socket address
         // port_num: port number on network byte order
-        PerfectLink(unsigned long int process_id, BestEffortBroadcast* i_beb, std::vector<Parser::Host> hosts, unsigned short port_num);
+        PerfectLink(unsigned long int process_id, std::map<long unsigned int, sockaddr_in>* i_host_addresses, unsigned short port_num);
+
+        
+        ~PerfectLink(){
+            for (auto thread: threads){
+                delete thread;
+            }
+        }
+
+        void setBEB(BestEffortBroadcast * i_beb){
+            beb = i_beb;
+        }
 
         // contains running threads of Perfect Link (listen, sendAcks, processArrivedMessages, sendPackets, addPacketsToOutBox)
         std::vector<std::thread *> threads; 
@@ -92,6 +103,11 @@ class PerfectLink{
         void send(Packet_ProcId packet_dest){
             packets_to_send.push(packet_dest);
         }
+
+        void closeSocket(){
+            udp_socket.closeConnection();
+        }
+
 
         
 };

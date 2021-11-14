@@ -3,20 +3,11 @@
 
 // hosts contains a mapping process_id, socket address
 // port_num: port number on network byte order
-PerfectLink::PerfectLink(unsigned long int i_process_id, BestEffortBroadcast* i_beb, std::vector<Parser::Host> hosts, unsigned short port_num) :
-    process_id(i_process_id), udp_socket(port_num, -1), beb(i_beb), outbox(NULL)
+PerfectLink::PerfectLink(unsigned long int i_process_id, std::map<long unsigned int, sockaddr_in>* i_host_addresses, unsigned short port_num) :
+    process_id(i_process_id), udp_socket(port_num, -1), host_addresses(i_host_addresses), outbox(NULL)
 {
-    //populate host_addresses
-    for (Parser::Host host : hosts){
-        sockaddr_in host_addr;
-        host_addr.sin_family = AF_INET;
-        in_addr ip;
-        ip.s_addr = host.ip;
-        host_addr.sin_addr = ip;
-        host_addr.sin_port = host.port;
-        host_addresses[host.id] = host_addr;
-    }
-    outbox.host_addresses = &host_addresses;
+    
+    outbox.host_addresses = i_host_addresses;
 
 }
 
@@ -63,7 +54,7 @@ void PerfectLink::processArrivedMessages(){
 void PerfectLink::sendAcks(){
     while (true){
         Packet_ProcId ack_dest = acks_to_send.pop();
-        sockaddr_in dest_addr = host_addresses[ack_dest.dest_proc_id];
+        sockaddr_in dest_addr = (*host_addresses)[ack_dest.dest_proc_id];
         sender_lock.lock();
         udp_socket.send(ack_dest.packet, reinterpret_cast<sockaddr*> (&dest_addr));
         sender_lock.unlock();
@@ -101,4 +92,6 @@ void PerfectLink::start(){
     threads.push_back(packet_sender);
     threads.push_back(outbox_dealer);
 }
+
+
 
