@@ -52,6 +52,8 @@ class OutBox{
 
         void sendPackets(UDPSocket * udp_socket);
 
+        void debug();
+
 };
 
 

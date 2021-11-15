@@ -6,7 +6,7 @@ FifoBroadcast::FifoBroadcast(ProcessController * i_process_controller, long unsi
                                  std::vector<Parser::Host> hosts):
 num_messages(i_num_messages), process_controller(i_process_controller){
     for (auto host: hosts){
-        next[host.id] = 1;
+        next[host.id] = 0;
     }
 }
 
@@ -27,6 +27,7 @@ void FifoBroadcast::URBDeliver(Packet p){
 void FifoBroadcast::fifoDeliver(){
     while(true){
         Packet p = packets_to_deliver.pop();
+        DEBUG_MSG("FIFO: about to deliver packet: " <<  p.source_id << " " << p.packet_seq_num);
         process_controller -> onPacketDelivered(p);
     }
 }
@@ -44,7 +45,7 @@ void FifoBroadcast::broadcast(){
 
         // packet is full
         if (!curr_packet.canAddMessage(curr_message)){  
-            DEBUG_MSG("trying to urb broadcast packet, messages processed:" << i << "\n");
+            DEBUG_MSG("FIFO: trying to urb broadcast packet, seq_num: " << curr_packet.packet_seq_num << "\n");
             process_controller -> onPacketBroadcast(curr_packet);
             urb -> broadcast(curr_packet);
             cur_seq_num++;
@@ -54,6 +55,7 @@ void FifoBroadcast::broadcast(){
 
         // last message, so send packet even if not full
         if (i == num_messages){ 
+            DEBUG_MSG("FIFO: trying to urb broadcast packet, seq_num: " << curr_packet.packet_seq_num << "\n");
             process_controller -> onPacketBroadcast(curr_packet);
             urb -> broadcast(curr_packet);
             cur_seq_num++;

@@ -38,6 +38,7 @@ void ProcessController::onPacketDelivered(packet::Packet p){
         out_content += "d " + std::to_string(p.source_id) + " " +  std::to_string(i) + "\n";
     }
     output_file << out_content;
+    DEBUG_MSG("Process Controller writing delivered");
 }
 
 
@@ -46,6 +47,7 @@ void ProcessController::onPacketDelivered(packet::Packet p){
     for (long unsigned int i = p.first_msg_seq_num; i < p.first_msg_seq_num + p.getNumMessages(); i++){
         out_content += "b " + std::to_string(i) + "\n";
     }
+    DEBUG_MSG("Process Controller writing broadcast");
     output_file << out_content;
  }
 
@@ -55,7 +57,7 @@ void ProcessController::onPacketDelivered(packet::Packet p){
      beb = new BestEffortBroadcast(perfect_link, hosts);
      perfect_link -> setBEB(beb);
 
-     urb = new UniformReliableBroadcast(hosts.size());
+     urb = new UniformReliableBroadcast(process_id, hosts.size());
      beb -> setURB(urb);
      urb -> setBEB(beb);
 
@@ -95,8 +97,14 @@ void ProcessController::onPacketDelivered(packet::Packet p){
 void ProcessController::stopProcess(){
     if (perfect_link != NULL){
         perfect_link->closeSocket();
-        std::cout << "Closed socket";
+        std::cout << "Closed socket\n";
     }
+    
+    
+    output_file.flush();
+    output_file.close();
+    std::cout << "Closed output files\n";
+    std::cout.flush();
 
     delete perfect_link;
     perfect_link = NULL;
@@ -106,8 +114,4 @@ void ProcessController::stopProcess(){
     urb = NULL;
     delete fifo_broadcast;
     fifo_broadcast = NULL;
-
-    std::cout.flush();
-    output_file.flush();
-    output_file.close();
 } 

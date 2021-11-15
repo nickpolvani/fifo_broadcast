@@ -94,7 +94,8 @@ Packet Packet::decodeData(char * data){
     assert((i > 2) == true);
     cur_pointer += i;
     
-    DEBUG_MSG(source_id_str << " " << process_id_str << " " << packet_seq_num_str << " " << first_msg_seq_num_str << " " << is_ack_str << " " << payload_length_str << "\n");
+   // DEBUG_MSG("meaning of numbers: source_id, process_id, packet_seq_num, first_msg_seq_num, is_ack, payload_length");
+    // DEBUG_MSG("PERFECT_LINK READING " << source_id_str << " " << process_id_str << " " << packet_seq_num_str << " " << first_msg_seq_num_str << " " << is_ack_str << " " << payload_length_str << "\n");
 
     long unsigned int i_source_id = std::stoul(source_id_str);
     long unsigned int i_process_id = std::stoul(process_id_str);

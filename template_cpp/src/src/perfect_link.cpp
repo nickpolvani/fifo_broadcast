@@ -6,9 +6,7 @@
 PerfectLink::PerfectLink(unsigned long int i_process_id, std::map<long unsigned int, sockaddr_in>* i_host_addresses, unsigned short port_num) :
     process_id(i_process_id), udp_socket(port_num, -1), host_addresses(i_host_addresses), outbox(NULL)
 {
-    
     outbox.host_addresses = i_host_addresses;
-
 }
 
 
@@ -31,20 +29,27 @@ void PerfectLink::listen(){
         2-b) remove corresponding packet from outbox
 */
 void PerfectLink::processArrivedMessages(){
-    Packet received = received_packets.pop();
-    if (received.is_ack){
-        outbox.removePacket(received.process_id, received.source_id, received.packet_seq_num);
-    }
-    else{
-        Packet ack = Packet::createAck(process_id, received.source_id, received.packet_seq_num);
-        long unsigned int dest_proc_id = received.process_id;
-        Packet_ProcId ack_and_dest = Packet_ProcId(ack, dest_proc_id);
-        acks_to_send.push(ack_and_dest);
+    while(true){
+        Packet received = received_packets.pop();
+        if (received.is_ack){
+            DEBUG_MSG("PERFECT-LINK received ACK: source: " <<  received.source_id << " sender: " << received.process_id << " seq_num: "  << received.packet_seq_num);
+            bool remove_success = outbox.removePacket(received.process_id, received.source_id, received.packet_seq_num);
+            DEBUG_MSG("PERFECT-LINK removed packet from outbox: " << remove_success);
+            //DEBUG!!!
+            outbox.debug();
+        }
+        else{
+            DEBUG_MSG("PERFECT-LINK received packet: source" <<  received.source_id << " sender: " << received.process_id << " seq_num: "  << received.packet_seq_num);
+            Packet ack = Packet::createAck(process_id, received.source_id, received.packet_seq_num);
+            long unsigned int dest_proc_id = received.process_id;
+            Packet_ProcId ack_and_dest = Packet_ProcId(ack, dest_proc_id);
+            acks_to_send.push(ack_and_dest);
 
-        // deliver if not already delivered
-        if (delivered[received.process_id][received.source_id].count(received.packet_seq_num) == 0){
-            delivered[received.process_id][received.source_id].insert(received.packet_seq_num);
-            deliver(received);
+            // deliver if not already delivered
+            if (delivered[received.process_id][received.source_id].count(received.packet_seq_num) == 0){
+                delivered[received.process_id][received.source_id].insert(received.packet_seq_num);
+                deliver(received);
+            }
         }
     }
 }
@@ -56,6 +61,7 @@ void PerfectLink::sendAcks(){
         Packet_ProcId ack_dest = acks_to_send.pop();
         sockaddr_in dest_addr = (*host_addresses)[ack_dest.dest_proc_id];
         sender_lock.lock();
+        DEBUG_MSG("PERFECT-LINK sending ACK: dest: " << ack_dest.dest_proc_id << " source: " <<  ack_dest.packet.source_id << " sender: " << ack_dest.packet.process_id << " seq_num: "  << ack_dest.packet.packet_seq_num);
         udp_socket.send(ack_dest.packet, reinterpret_cast<sockaddr*> (&dest_addr));
         sender_lock.unlock();
     }
@@ -64,6 +70,7 @@ void PerfectLink::sendAcks(){
 void PerfectLink::sendPackets(){
     while(true){
         sender_lock.lock();
+        //DEBUG_MSG("PERFECT-LINK sending packets from outbox");
         outbox.sendPackets(&udp_socket);
         sender_lock.unlock();
         std::this_thread::sleep_for(std::chrono::milliseconds(500));

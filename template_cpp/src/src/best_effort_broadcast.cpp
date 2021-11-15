@@ -12,15 +12,21 @@ void BestEffortBroadcast::deliver(){
 
 void BestEffortBroadcast::broadcast(){
     while(true){
-        Packet cur_packet;
+        // it works because this is the only consumer of packets_to_rebroadcast
         if (packets_to_re_broadcast.getSize() > 0){
-            cur_packet = packets_to_re_broadcast.pop();
+            Packet cur_packet = packets_to_re_broadcast.pop();
+            DEBUG_MSG("BEB RE-Broadcasting: packet source: " <<  cur_packet.source_id << " sender: " << cur_packet.process_id << " seq_num: "  << cur_packet.packet_seq_num);
+            for (auto host : hosts){
+                perfect_link -> send(Packet_ProcId(cur_packet, host.id));
+            }
         }
-        else{
-            cur_packet = packets_to_broadcast.pop();
-        }
-        for (auto host : hosts){
-            perfect_link -> send(Packet_ProcId(cur_packet, host.id));
+        // it works because this is the only consumer of packets_to_broadcast
+        if(packets_to_broadcast.getSize() > 0){
+            Packet cur_packet = packets_to_broadcast.pop();
+            DEBUG_MSG("BEB Broadcasting: packet seq_num: "  << cur_packet.packet_seq_num);
+            for (auto host : hosts){
+                perfect_link -> send(Packet_ProcId(cur_packet, host.id));
+            }
         }
     }
 }

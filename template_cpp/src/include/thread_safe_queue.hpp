@@ -19,7 +19,7 @@ class ThreadSafeQueue{
 
 private:
 
-    size_t curr_size;
+    std::atomic<size_t> curr_size;
     size_t max_size;    // max number of items in the queue
     std::condition_variable cv_push, cv_pop; // condition variables for push() pop() operations
     std::mutex mutex;       // mutex for locking the queue

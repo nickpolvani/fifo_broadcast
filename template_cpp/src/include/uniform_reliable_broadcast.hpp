@@ -19,6 +19,8 @@ class FifoBroadcast;
 class UniformReliableBroadcast{
 
     private:
+        long unsigned int process_id;
+
         // delivered[source_id] returns the set of sequence numbers of delivered packets
         std::map<long unsigned int, std::set<long unsigned int>> delivered;
 
@@ -53,7 +55,8 @@ class UniformReliableBroadcast{
 
     public:
 
-        UniformReliableBroadcast(long unsigned int i_num_processes) : num_processes(i_num_processes){}
+        UniformReliableBroadcast(long unsigned int i_process_id, long unsigned int i_num_processes) : 
+        process_id(i_process_id), num_processes(i_num_processes){}
 
         ~UniformReliableBroadcast(){
             for (auto thread: threads){
