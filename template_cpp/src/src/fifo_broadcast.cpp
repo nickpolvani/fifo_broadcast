@@ -28,6 +28,11 @@ void FifoBroadcast::fifoDeliver(){
     while(true){
         Packet p = packets_to_deliver.pop();
         DEBUG_MSG("FIFO: about to deliver packet: " <<  p.source_id << " " << p.packet_seq_num);
+        // if I deliver the packet I broadcasted I can broadcast the next one
+        if (p.source_id == process_controller ->process_id){
+            can_broadcast = true;
+            broadcast_cv.notify_all();
+        }
         process_controller -> onPacketDelivered(p);
     }
 }
@@ -38,15 +43,24 @@ void FifoBroadcast::broadcast(){
     DEBUG_MSG("number of packets to send: " << num_messages << "\n");
     unsigned long int process_id = process_controller -> process_id;
 
+    std::unique_lock lock(mutex);
+
     // create and send Packets
     Packet curr_packet(process_id, process_id, cur_seq_num);
     for (long unsigned int i = 1; i <= num_messages; i++){
         Message curr_message(std::to_string(i));
 
-        // packet is full
-        if (!curr_packet.canAddMessage(curr_message)){  
+        while(!can_broadcast){
+            broadcast_cv.wait(lock);
+        }
+
+        // packet is full (leave a margin of 5 bytes to change the process_id when re-broadcasting messages)
+        if (!curr_packet.canAddMessage(curr_message, 5)){  
             DEBUG_MSG("FIFO: trying to urb broadcast packet, seq_num: " << curr_packet.packet_seq_num << "\n");
             process_controller -> onPacketBroadcast(curr_packet);
+            // set before because otherwise I could execute the delivery and then set this variable to false again
+            // having a deadlock
+            can_broadcast = false;   
             urb -> broadcast(curr_packet);
             cur_seq_num++;
             curr_packet = Packet(process_id, process_id, cur_seq_num);
@@ -57,6 +71,9 @@ void FifoBroadcast::broadcast(){
         if (i == num_messages){ 
             DEBUG_MSG("FIFO: trying to urb broadcast packet, seq_num: " << curr_packet.packet_seq_num << "\n");
             process_controller -> onPacketBroadcast(curr_packet);
+            // set before because otherwise I could execute the delivery and then set this variable to false again
+            // having a deadlock
+            can_broadcast = false;
             urb -> broadcast(curr_packet);
             cur_seq_num++;
         }

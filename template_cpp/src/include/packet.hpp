@@ -7,6 +7,7 @@
 #include <cstring>
 #include <stdexcept>
 #include "debug.h"
+#include <iostream>
 
 namespace packet{
 
@@ -73,11 +74,35 @@ class Packet{
         
         Packet(): process_id(0), source_id(0), packet_seq_num(0){};
 
+        // called when re-broadcasting a received message
+        void changeSenderId(long unsigned int new_id){
+            process_id = new_id;
+            if(getLength() > MAX_LENGTH){
+                throw(std::length_error("Changing sender id is not possible: size: " + std::to_string(getLength()) + " greater than MAX_SIZE\n" ));
+            }
+        }
+
         bool canAddMessage(Message m){
             if (is_ack){
                 return false;
             }else{
-                return getLength() + m.get_length() < max_length;
+                unsigned long int new_payload_length = std::to_string(payload_length + m.get_length()).size();
+                unsigned long int old_payload_length = std::to_string(payload_length).size();
+                unsigned long int new_packet_length = getLength() - old_payload_length + new_payload_length + m.get_length();
+                return new_packet_length <= max_length;
+            }
+        }
+
+
+        // see if can add message keeping margin_bytes unset at the end of the buffer
+        bool canAddMessage(Message m, unsigned long int margin_bytes){
+            if (is_ack){
+                return false;
+            }else{
+                unsigned long int new_payload_length = std::to_string(payload_length + m.get_length()).size();
+                unsigned long int old_payload_length = std::to_string(payload_length).size();
+                unsigned long int new_packet_length = getLength() - old_payload_length + new_payload_length + m.get_length();
+                return new_packet_length + margin_bytes <= max_length;
             }
         }
 
@@ -110,7 +135,7 @@ class Packet{
                                 std::to_string(source_id).size() + 
                                 std::to_string(first_msg_seq_num).size() +
                                 std::to_string(static_cast<unsigned int>(is_ack)).size() +
-                                std::to_string(payload_length).size() + 5; //NULL characters
+                                std::to_string(payload_length).size() + 6; //NULL characters
 
             return header_length + payload_length; 
         }

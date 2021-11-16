@@ -82,15 +82,6 @@ void ProcessController::onPacketDelivered(packet::Packet p){
      for (auto thread : fifo_broadcast -> threads){
          thread->join();
      }
-
-    delete perfect_link;
-    perfect_link = NULL;
-    delete beb;
-    beb = NULL;
-    delete urb;
-    urb = NULL;
-    delete fifo_broadcast;
-    fifo_broadcast = NULL;
  }
 
  
@@ -100,18 +91,9 @@ void ProcessController::stopProcess(){
         std::cout << "Closed socket\n";
     }
     
-    
     output_file.flush();
     output_file.close();
     std::cout << "Closed output files\n";
     std::cout.flush();
 
-    delete perfect_link;
-    perfect_link = NULL;
-    delete beb;
-    beb = NULL;
-    delete urb;
-    urb = NULL;
-    delete fifo_broadcast;
-    fifo_broadcast = NULL;
 } 

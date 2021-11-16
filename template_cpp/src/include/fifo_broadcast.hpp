@@ -8,6 +8,8 @@
 #include <thread>
 #include "parser.hpp"
 #include "process_controller.hpp"
+#include <mutex> 
+#include <condition_variable>
 
 using namespace packet;
 
@@ -17,6 +19,13 @@ class ProcessController;
 class FifoBroadcast{
 
     private:
+
+        std::mutex mutex;
+        // condition variable to wait on broadcast until packet is delivered to not flood the network
+        std::condition_variable broadcast_cv;
+
+        bool can_broadcast = true;   
+
         // current packet sequence number for this process
         long unsigned int cur_seq_num = 0;
         
@@ -48,11 +57,6 @@ class FifoBroadcast{
         // initializes next, and sets num_messags
         FifoBroadcast(ProcessController * process_controller, long unsigned int i_num_messages, std::vector<Parser::Host> hosts);
 
-        ~FifoBroadcast(){
-            for (auto thread: threads){
-                delete thread;
-            }
-        }
 
         // contains threads that execute fifoDeliver, broadcast
         std::vector<std::thread *> threads;

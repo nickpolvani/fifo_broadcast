@@ -58,11 +58,6 @@ class UniformReliableBroadcast{
         UniformReliableBroadcast(long unsigned int i_process_id, long unsigned int i_num_processes) : 
         process_id(i_process_id), num_processes(i_num_processes){}
 
-        ~UniformReliableBroadcast(){
-            for (auto thread: threads){
-                delete thread;
-            }
-        }
         
         // contains active threads (URBDeliver)
         std::vector<std::thread *> threads;

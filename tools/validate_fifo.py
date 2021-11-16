@@ -9,8 +9,13 @@ import signal
 import random
 import time
 from enum import Enum
+import glob
 
 from collections import defaultdict, OrderedDict
+
+
+
+DELIVERED_MESSAGES = 0
 
 def check_positive(value):
     ivalue = int(value)
@@ -20,6 +25,7 @@ def check_positive(value):
 
 
 def checkProcess(filePath):
+    global DELIVERED_MESSAGES
     i = 1
     nextMessage = defaultdict(lambda : 1)
     filename = os.path.basename(filePath)
@@ -45,8 +51,17 @@ def checkProcess(filePath):
                     return False
                 else:
                     nextMessage[sender] = msg + 1
-
+                    DELIVERED_MESSAGES += 1
     return True
+
+
+def check_dir(path):
+    if os.path.isdir(path):
+        return path
+    else:
+        raise ValueError(path, "is not a directory")
+
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -59,20 +74,34 @@ if __name__ == "__main__":
         help="Total number of processes",
     )
 
-    parser.add_argument('output', nargs='+')
+    parser.add_argument("--out_dir",
+        required=True,
+        type=check_dir,
+        dest="out_dir",
+        help="Output directory",)
 
     results = parser.parse_args()
 
-    if len(results.output) != results.proc_num:
+    out_files = glob.glob(os.path.join(results.out_dir, "*.output"))
+
+    if len(out_files) != results.proc_num:
         print("Not as many output files as number of processes")
         exit(1)
-
-    for o in results.output:
+    
+    num_failures = 0
+    for o in out_files:
         print("Checking {}".format(o))
         if checkProcess(o):
             print("Validation OK")
         else:
             print("Validation failed!")
+            num_failures += 1
+
+    if num_failures > 0:
+        print("Number of failures detected:", num_failures)
+    else:
+        print("All output files are correct")
+        print("Number of delivered messages in total:", DELIVERED_MESSAGES)
 
 
 

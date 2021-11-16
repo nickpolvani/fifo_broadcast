@@ -81,12 +81,6 @@ class PerfectLink{
         // port_num: port number on network byte order
         PerfectLink(unsigned long int process_id, std::map<long unsigned int, sockaddr_in>* i_host_addresses, unsigned short port_num);
 
-        
-        ~PerfectLink(){
-            for (auto thread: threads){
-                delete thread;
-            }
-        }
 
         void setBEB(BestEffortBroadcast * i_beb){
             beb = i_beb;

@@ -20,7 +20,7 @@ class OutBox{
 
     private:
         size_t curr_size;
-        size_t max_size = 100;
+        size_t max_size = 500;
         //condition variables for add operation
         std::condition_variable cv_add;  
         std::mutex mutex;  // lock for the outbox

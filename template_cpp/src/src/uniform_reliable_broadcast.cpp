@@ -30,8 +30,8 @@ void UniformReliableBroadcast::BEBDeliver(Packet p){
         pending_mutex.unlock(); // free lock because you could wait on the next instruction
 
         DEBUG_MSG("BEBDeliver: about to RE-Broadcast, source " <<  p.source_id << " previous sender: " << p.process_id << " seq_num: "  << p.packet_seq_num);
-        // change sender process to this one
-        p.process_id = process_id;
+        // change sender process to this one 
+        p.changeSenderId(process_id);
         beb -> re_broadcast(p);
         DEBUG_MSG("successfully added to packets_to_re_broadcast");
         pending_mutex.lock(); //regain lock for next part of execution

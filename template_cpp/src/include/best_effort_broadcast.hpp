@@ -39,11 +39,6 @@ class BestEffortBroadcast{
         BestEffortBroadcast( PerfectLink* pl, std::vector<Parser::Host> i_hosts): 
            perfect_link(pl), hosts(i_hosts){}; 
 
-        ~BestEffortBroadcast(){
-            for (auto thread: threads){
-                delete thread;
-            }
-        }
 
         void setURB(UniformReliableBroadcast* i_urb){
             urb = i_urb;

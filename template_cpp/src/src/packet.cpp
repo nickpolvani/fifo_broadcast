@@ -91,7 +91,7 @@ Packet Packet::decodeData(char * data){
     cur_pointer += i;
 
     i = copyString(cur_pointer, &payload_length_str);
-    assert((i > 2) == true);
+    assert((i >= 2) == true);
     cur_pointer += i;
     
    // DEBUG_MSG("meaning of numbers: source_id, process_id, packet_seq_num, first_msg_seq_num, is_ack, payload_length");
@@ -111,6 +111,9 @@ Packet Packet::decodeData(char * data){
         Packet p = Packet(i_process_id, i_source_id, i_packet_seq_num); 
         while (p.payload_length < payload_length){
             Message cur_message = Message::decodeData(cur_pointer); //retrieve current message
+            if (!p.canAddMessage(cur_message)){
+                std::cerr << "Error when trying to reconstruct Packet !!!\n";
+            }
             p.addMessage(cur_message);
             cur_pointer += cur_message.get_length();
         }

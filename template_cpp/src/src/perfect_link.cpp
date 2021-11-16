@@ -1,5 +1,9 @@
 #include "perfect_link.hpp"
-
+#ifndef DEBUG
+static bool debug_mode = false;
+#else
+static bool debug_mode = true;
+#endif
 
 // hosts contains a mapping process_id, socket address
 // port_num: port number on network byte order
@@ -35,8 +39,7 @@ void PerfectLink::processArrivedMessages(){
             DEBUG_MSG("PERFECT-LINK received ACK: source: " <<  received.source_id << " sender: " << received.process_id << " seq_num: "  << received.packet_seq_num);
             bool remove_success = outbox.removePacket(received.process_id, received.source_id, received.packet_seq_num);
             DEBUG_MSG("PERFECT-LINK removed packet from outbox: " << remove_success);
-            //DEBUG!!!
-            outbox.debug();
+
         }
         else{
             DEBUG_MSG("PERFECT-LINK received packet: source" <<  received.source_id << " sender: " << received.process_id << " seq_num: "  << received.packet_seq_num);
@@ -70,7 +73,10 @@ void PerfectLink::sendAcks(){
 void PerfectLink::sendPackets(){
     while(true){
         sender_lock.lock();
-        //DEBUG_MSG("PERFECT-LINK sending packets from outbox");
+        DEBUG_MSG("PERFECT-LINK sending packets from outbox");
+        if (debug_mode){
+            outbox.debug();
+        }
         outbox.sendPackets(&udp_socket);
         sender_lock.unlock();
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
