@@ -86,10 +86,11 @@ class Packet{
             if (is_ack){
                 return false;
             }else{
+                /*
                 unsigned long int new_payload_length = std::to_string(payload_length + m.get_length()).size();
                 unsigned long int old_payload_length = std::to_string(payload_length).size();
-                unsigned long int new_packet_length = getLength() - old_payload_length + new_payload_length + m.get_length();
-                return new_packet_length <= max_length;
+                unsigned long int new_packet_length = getLength() - old_payload_length + new_payload_length + m.get_length();*/
+                return getLength() + m.get_length() <= max_length;
             }
         }
 
@@ -99,10 +100,11 @@ class Packet{
             if (is_ack){
                 return false;
             }else{
+                /*
                 unsigned long int new_payload_length = std::to_string(payload_length + m.get_length()).size();
                 unsigned long int old_payload_length = std::to_string(payload_length).size();
-                unsigned long int new_packet_length = getLength() - old_payload_length + new_payload_length + m.get_length();
-                return new_packet_length + margin_bytes <= max_length;
+                unsigned long int new_packet_length = getLength() - old_payload_length + new_payload_length + m.get_length();*/
+                return getLength() + margin_bytes  + m.get_length() <= max_length;
             }
         }
 

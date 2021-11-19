@@ -5,4 +5,4 @@ cd "$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 echo Validating FIFO... 
 
-python validate_fifo.py --proc_num 64 --out_dir ../example/output
+python validate_fifo.py --proc_num 128 --out_dir ../example/output

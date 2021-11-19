@@ -113,6 +113,7 @@ Packet Packet::decodeData(char * data){
             Message cur_message = Message::decodeData(cur_pointer); //retrieve current message
             if (!p.canAddMessage(cur_message)){
                 std::cerr << "Error when trying to reconstruct Packet !!!\n";
+                std::cerr << "Expected payload length: " << payload_length << "\n";
             }
             p.addMessage(cur_message);
             cur_pointer += cur_message.get_length();
